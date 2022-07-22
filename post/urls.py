@@ -9,5 +9,4 @@ urlpatterns = [
 
     path('job', JobView.as_view()),
     path('apply', ApplyView.as_view()),
-    path('apply?status=<str:status>', ApplyView.as_view())
 ]

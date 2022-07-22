@@ -58,21 +58,38 @@ class BusinessArea(models.Model):
         db_table = 'business_areas'
 
 
-class JobPostActivity(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE, null=True)
-    apply_date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = "job_post_activity"
-
-
 class ApplyStatus(models.Model):
     status = models.CharField(max_length=50)
-    job_post_activity = models.ManyToManyField(JobPostActivity, null=True)
 
     def __str__(self):
         return self.status
 
     class Meta:
         db_table = "apply_status"
+
+
+class JobPostActivity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE, null=True)
+    apply_date = models.DateTimeField(auto_now_add=True)
+    job_status = models.ForeignKey(ApplyStatus, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        db_table = "job_post_activity"
+
+
+class JobEvaluationStatus(models.Model):
+    status = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = "job_evaluation_status"
+
+
+class JobPostActivityLog(models.Model):
+    job_post_activity = models.ForeignKey(JobPostActivity, on_delete=models.SET_NULL, null=True)
+    interviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    job_evaluation = models.ForeignKey(JobEvaluationStatus, on_delete=models.SET_NULL, null=True)
+    action_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "job_post_activity_log"

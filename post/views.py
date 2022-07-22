@@ -81,19 +81,19 @@ class ApplyView(APIView):
         request.data['user'] = request.user.id
         apply_serialzer = JobPostActivitySerializer(data=request.data)
         if apply_serialzer.is_valid():
-            JobPostActivity.objects.get(user=request.user.id).status = "submitted"
-            apply_serialzer.save()
-            return Response(status=status.HTTP_200_OK)
+            initial_status = ApplyStatus.objects.get(status="submitted")
+            apply_serialzer.save(job_status=initial_status)
+            return Response({'message': '지원 완료!'}, status=status.HTTP_200_OK)
 
         return Response(apply_serialzer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
-        apply_serialzer = JobPostActivitySerializer(data=request.data)
-        job_application_status = ApplyStatus.objects.filter(status=request)
-        data = {
-            'apply_serialzer' : apply_serialzer, 'job_application_status': job_application_status
-        }
-        print('2:', job_application_status.values()) # 쿼리스트링 이거 어떻게 쓰는데.. 쿼리셋 빈값이야~~~
-        print('3:', data)
-        return Response(data, status=status.HTTP_200_OK)
+        application_status = request.GET.get('status')
+        applications = JobPostActivity.objects.filter(job_status__status=application_status)
+
+        if applications.exists():
+            serializer = JobPostActivitySerializer(applications, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
