@@ -65,3 +65,14 @@ class JobPostActivity(models.Model):
 
     class Meta:
         db_table = "job_post_activity"
+
+
+class ApplyStatus(models.Model):
+    status = models.CharField(max_length=50)
+    job_post_activity = models.ManyToManyField(JobPostActivity, null=True)
+
+    def __str__(self):
+        return self.status
+
+    class Meta:
+        db_table = "apply_status"
